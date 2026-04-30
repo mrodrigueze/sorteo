@@ -20,7 +20,7 @@
 document.getElementById("form").addEventListener("submit", function(e){
   e.preventDefault();
 
-  fetch("TU_URL_DE_APPS_SCRIPT", {
+  fetch("https://script.google.com/macros/s/AKfycbwT41GGhbEYXIdCkj-sZsm1zCRSGihhgEKkI2x2zVEFTKopgpRgaBpPXm4xGwpQOVBa2w/exec", {
     method: "POST",
     body: JSON.stringify({
       nombre: document.getElementById("nombre").value,
