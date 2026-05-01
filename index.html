@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rifa A LA SUERTE</title>
+  <meta property="og:title" content="Rifa">
+  <meta property="og:description" content="Registro de datos">
+  <title>Rifa</title>
   <style>
     body { font-family: system-ui, sans-serif; background: #f5f5f3; display: flex; flex-direction: column; align-items: center; padding: 2rem; gap: 1rem; }
     .card { background: #fff; border: 1px solid #e5e5e5; border-radius: 14px; padding: 1.5rem; width: 100%; max-width: 420px; box-sizing: border-box; }
@@ -17,8 +19,11 @@
     .err { display: block; background: #FCEBEB; color: #A32D2D; }
     .info { display: none; background: #e8f4fd; color: #0d4a82; padding: 8px; border-radius: 6px; font-size: 13px; margin-top: -10px; margin-bottom: 1rem; }
     
-    .progress-container { width: 100%; background: #e0e0e0; border-radius: 8px; overflow: hidden; margin-bottom: 0.5rem; }
-    .progress-bar { height: 22px; background: #28a745; width: 0%; text-align: center; color: white; font-size: 12px; line-height: 22px; transition: width 0.4s ease; font-weight: bold; }
+    .progress-container { width: 100%; background: #e0e0e0; border-radius: 8px; overflow: hidden; margin-bottom: 0.5rem; position: relative; }
+    .progress-bar { height: 22px; background: #f39c12; width: 0%; text-align: center; color: white; font-size: 12px; line-height: 22px; transition: width 0.4s ease, background-color 0.4s ease; font-weight: bold; white-space: nowrap; overflow: hidden; }
+    .progress-bar.success { background: #28a745; }
+    .marker { position: absolute; left: 40%; top: 0; bottom: 0; width: 2px; background: #d32f2f; z-index: 10; }
+    
     .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
     .stat-box { background: #f9f9f9; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #eee; }
     .stat-val { font-size: 20px; font-weight: bold; color: #185FA5; }
@@ -31,7 +36,10 @@
 
   <div class="card">
     <h2>📊 Avance de Meta</h2>
-    <div class="progress-container"><div id="progressBar" class="progress-bar">0%</div></div>
+    <div class="progress-container">
+      <div class="marker" title="Mínimo 2000"></div>
+      <div id="progressBar" class="progress-bar">0%</div>
+    </div>
     <div style="display: flex; justify-content: space-between; font-size: 12px; color: #555;">
       <span>Vendidos: <strong id="tVendidos">0</strong></span>
       <span>Total(Inc.Extra): <strong id="tTotal">0</strong></span>
@@ -44,14 +52,14 @@
   </div>
 
   <div class="card">
-    <h1>🎟️ Compra de Tickets</h1>
+    <h1>🎟️ Rifa</h1>
     <form id="form">
+      <label>Nombres completos</label>
+      <input id="nombre" type="text" required>
+      
       <label>Celular</label>
       <input id="celular" type="tel" required>
       <div id="alertaExiste" class="info"></div>
-      
-      <label>Nombre completo</label>
-      <input id="nombre" type="text" required>
       
       <label>Número de tickets</label>
       <input id="tickets" type="number" min="1" required>
@@ -73,23 +81,35 @@
   </div>
 
   <script>
-    const API = "https://script.google.com/macros/s/AKfycbxnlP7wv0GymtVjYxcW6ICQs6ekbAkT_DBs2_AwwNKFXrolmJ5e_XUIKe0jatYgB661IQ/exec"; // ¡REEMPLAZAR!
-    let bdParticipantes = []; // Caché local
+    const API = "https://script.google.com/macros/s/TU_ID_AQUI/exec";
+    let bdParticipantes = []; 
 
     function renderDashboard(data) {
       if (!data || !data.kpis) return;
       bdParticipantes = data.lista || [];
       
-      const pct = Math.min((data.kpis.tickets_v / 5000) * 100, 100).toFixed(1);
-      document.getElementById("progressBar").style.width = pct + "%";
-      document.getElementById("progressBar").textContent = pct + "%";
+      const vendidos = data.kpis.tickets_v || 0;
+      const pct = Math.min((vendidos / 5000) * 100, 100).toFixed(1);
+      const pBar = document.getElementById("progressBar");
       
-      document.getElementById("tVendidos").textContent = data.kpis.tickets_v;
+      pBar.style.width = pct + "%";
+      
+      if (vendidos >= 5000) {
+        pBar.textContent = "¡Felicidades, conseguiste el objetivo!";
+        pBar.className = "progress-bar success";
+      } else if (vendidos >= 2000) {
+        pBar.textContent = pct + "%";
+        pBar.className = "progress-bar success";
+      } else {
+        pBar.textContent = pct + "%";
+        pBar.className = "progress-bar";
+      }
+      
+      document.getElementById("tVendidos").textContent = vendidos;
       document.getElementById("tTotal").textContent = data.kpis.total_tickets;
       document.getElementById("kDinero").textContent = "S/ " + data.kpis.total_dinero;
       document.getElementById("kPart").textContent = data.kpis.participantes;
 
-      // Poblar datalist de referencias
       document.getElementById("listaRefs").innerHTML = bdParticipantes.map(p => 
         `<option value="${p.celular}">${p.nombre}</option>`
       ).join('');
@@ -101,7 +121,6 @@
         `<tr><td>${r[0]}</td><td style="text-align:right; color:#28a745;"><strong>+${r[1]}</strong></td></tr>`).join('');
     }
 
-    // Detector de celular recurrente
     document.getElementById("celular").addEventListener("input", (e) => {
       const cel = e.target.value.trim();
       const match = bdParticipantes.find(p => p.celular === cel);
