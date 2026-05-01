@@ -3,84 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>rifa 2026</title>
-
-  <!-- Fix de cache: el navegador siempre verificará si hay una versión nueva -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-
+  <title>Rifa 2026</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #f5f5f3; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-    .card { background: #fff; border: 1px solid #e5e5e5; border-radius: 14px; padding: 2rem; width: 100%; max-width: 420px; }
-    .header { text-align: center; margin-bottom: 2rem; }
-    .icon { width: 48px; height: 48px; background: #e6f1fb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 20px; }
-    h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-    .subtitle { font-size: 14px; color: #888; }
-    .field { margin-bottom: 1.25rem; }
-    label { display: block; font-size: 13px; font-weight: 500; color: #555; margin-bottom: 6px; }
-    input { width: 100%; padding: 10px 12px; font-size: 15px; background: #fafafa; border: 1px solid #ddd; border-radius: 8px; color: #111; transition: border-color 0.15s; }
-    input:focus { outline: none; border-color: #185FA5; box-shadow: 0 0 0 3px rgba(24,95,165,0.1); }
-    .btn { width: 100%; padding: 12px; font-size: 15px; font-weight: 600; background: #185FA5; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
-    .btn:hover { background: #0C447C; }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .msg { margin-top: 1rem; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
-    .msg.ok { background: #EAF3DE; color: #3B6D11; display: block; }
-    .msg.err { background: #FCEBEB; color: #A32D2D; display: block; }
+    body   { font-family: system-ui, sans-serif; background: #f5f5f3; display: flex; justify-content: center; padding: 2rem; }
+    .card  { background: #fff; border: 1px solid #e5e5e5; border-radius: 14px; padding: 2rem; width: 100%; max-width: 420px; }
+    h1     { font-size: 20px; margin-bottom: 1.5rem; }
+    label  { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
+    input  { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 1rem; }
+    button { width: 100%; padding: 12px; background: #185FA5; color: #fff; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; }
+    button:disabled { opacity: 0.6; }
+    .msg   { margin-top: 1rem; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
+    .ok    { display: block; background: #EAF3DE; color: #3B6D11; }
+    .err   { display: block; background: #FCEBEB; color: #A32D2D; }
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="header">
-      <div class="icon">🎟️</div>
-      <h1>Compra de Tickets</h1>
-      <p class="subtitle">Completa el formulario para reservar tus entradas</p>
-    </div>
-
+    <h1>🎟️ Compra de Tickets</h1>
     <form id="form">
-      <div class="field">
-        <label for="nombre">Nombre completo</label>
-        <input type="text" id="nombre" placeholder="Tu nombre" required>
-      </div>
-      <div class="field">
-        <label for="celular">Celular</label>
-        <input type="tel" id="celular" placeholder="+51 999 999 999" required>
-      </div>
-      <div class="field">
-        <label for="tickets">Número de tickets</label>
-        <input type="number" id="tickets" placeholder="1" min="1" required>
-      </div>
-      <button type="submit" class="btn" id="btn">Enviar solicitud</button>
+      <label>Nombre completo</label>
+      <input id="nombre" type="text" required>
+      <label>Celular</label>
+      <input id="celular" type="tel" required>
+      <label>Número de tickets</label>
+      <input id="tickets" type="number" min="1" required>
+      <button id="btn">Enviar solicitud</button>
     </form>
-
-    <div class="msg" id="msg"></div>
+    <p id="msg" class="msg"></p>
   </div>
 
   <script>
-    document.getElementById("form").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const btn = document.getElementById("btn");
-      const msg = document.getElementById("msg");
+    const API = "https://script.google.com/macros/s/AKfycby1WS6UaGuVeRyK7tMCKoPJM1mnQzfhPiR87gIBOvWJlib4VA4qTLy557X884QVRMDxZw/exec";
+    const btn = document.getElementById("btn");
+    const msg = document.getElementById("msg");
 
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
       btn.disabled = true;
       btn.textContent = "Enviando...";
-      msg.className = "msg";
 
       try {
-        await fetch("https://script.google.com/macros/s/AKfycby1WS6UaGuVeRyK7tMCKoPJM1mnQzfhPiR87gIBOvWJlib4VA4qTLy557X884QVRMDxZw/exec", {
+        await fetch(API, {
           method: "POST",
           body: JSON.stringify({
-            nombre: document.getElementById("nombre").value,
+            nombre:  document.getElementById("nombre").value,
             celular: document.getElementById("celular").value,
-            tickets: document.getElementById("tickets").value
-          })
+            tickets: document.getElementById("tickets").value,
+          }),
         });
-        msg.textContent = "¡Listo! Tus datos fueron enviados correctamente.";
+        msg.textContent = "¡Listo! Datos enviados correctamente.";
         msg.className = "msg ok";
-        document.getElementById("form").reset();
+        e.target.reset();
       } catch {
-        msg.textContent = "Ocurrió un error. Por favor intenta nuevamente.";
+        msg.textContent = "Error al enviar. Intenta nuevamente.";
         msg.className = "msg err";
       }
 
