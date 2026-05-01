@@ -9,32 +9,35 @@
     body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem; display: flex; justify-content: center; }
     .layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem; max-width: 1200px; width: 100%; align-items: start; }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-    h1, h2 { font-size: 1.1rem; margin: 0 0 1rem 0; color: var(--p); border-bottom: 2px solid var(--bg); padding-bottom: 0.5rem; }
+    h1, h2, h3 { color: var(--p); margin: 0 0 1rem 0; }
+    h1, h2 { font-size: 1.1rem; border-bottom: 2px solid var(--bg); padding-bottom: 0.5rem; }
+    h3 { font-size: 0.9rem; margin-bottom: 0.5rem; }
     
-    /* Formulario Tipo Excel */
     .table-header { display: grid; grid-template-columns: 2fr 1.5fr 1fr 2fr; gap: 10px; font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 0.5rem; }
     .form-row { display: grid; grid-template-columns: 2fr 1.5fr 1fr 2fr; gap: 10px; margin-bottom: 10px; align-items: start; }
+    .mobile-label { display: none; font-size: 0.75rem; font-weight: bold; color: var(--p); margin-bottom: 4px; }
+    
     input { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; box-sizing: border-box; transition: border-color 0.2s; }
     input:focus { border-color: var(--p); }
     input:disabled { background: #f8fafc; color: #94a3b8; }
     
-    /* Botones */
     .btn-add { background: transparent; color: var(--p); border: 1px dashed var(--p); padding: 0.6rem; width: 100%; border-radius: 6px; cursor: pointer; font-size: 0.9rem; margin-bottom: 1.5rem; transition: background 0.2s; }
     .btn-add:hover { background: #f0f6fc; }
     .btn-submit { background: var(--p); color: white; border: none; padding: 0.8rem; width: 100%; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: opacity 0.2s; }
     .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+    .btn-del { background: #fee2e2; color: #991b1b; border: none; border-radius: 6px; padding: 0 12px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; height: 100%; }
+    .btn-del:hover { opacity: 0.8; }
     
-    /* Dashboard & KPIs */
     .progress-container { width: 100%; background: var(--border); border-radius: 6px; overflow: hidden; margin: 0.5rem 0; position: relative; height: 24px; }
     .progress-bar { height: 100%; background: #f59e0b; width: 0%; text-align: center; color: white; font-size: 0.8rem; line-height: 24px; transition: 0.4s; font-weight: bold; }
     .progress-bar.success { background: var(--ok); }
     .marker { position: absolute; left: 40%; top: 0; bottom: 0; width: 2px; background: rgba(0,0,0,0.3); z-index: 10; }
+    
     .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
     .stat-box { background: var(--bg); padding: 1rem; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
     .stat-val { font-size: 1.5rem; font-weight: bold; color: var(--p); }
     .stat-lbl { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
     
-    /* Tablas Data */
     table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--border); }
     .scrollable { max-height: 200px; overflow-y: auto; margin-bottom: 1rem; }
@@ -44,40 +47,34 @@
     .msg.err { display: block; background: #fee2e2; color: #991b1b; }
     .info-text { font-size: 0.75rem; color: var(--p); display: block; margin-top: 4px; min-height: 14px; }
 
-    /* Móvil */
     @media (max-width: 768px) {
       .layout { grid-template-columns: 1fr; }
       body { padding: 1rem; }
       .table-header { display: none; }
-      .form-row { grid-template-columns: 1fr; border-bottom: 1px dashed var(--border); padding-bottom: 1rem; }
-      input { margin-bottom: 0.5rem; }
+      .form-row { display: flex; flex-direction: column; gap: 5px; border-bottom: 1px dashed var(--border); padding-bottom: 1rem; }
+      .mobile-label { display: block; }
     }
   </style>
 </head>
 <body>
 
   <div class="layout">
-    <!-- Lado Izquierdo: Formularios -->
     <div class="card">
       <h1>🎟️ Registro Rápido</h1>
       <div class="table-header">
         <div>Nombres Completos</div>
         <div>Celular</div>
         <div>N° Tickets</div>
-        <div>Referencia</div>
+        <div>Referencia (Número)</div>
       </div>
       
       <form id="form">
         <div id="rowContainer">
-          <!-- Fila Base -->
           <div class="form-row">
-            <input type="text" class="i-nom" placeholder="Ej: Juan Pérez" required>
-            <div>
-              <input type="tel" class="i-cel" placeholder="Ej: 987654321" required>
-              <span class="info-text"></span>
-            </div>
-            <input type="number" class="i-tkt" min="1" placeholder="Ej: 5" required>
-            <input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off">
+            <div><label class="mobile-label">Nombres Completos</label><input type="text" class="i-nom" placeholder="Ej: Juan Pérez" required></div>
+            <div><label class="mobile-label">Celular</label><input type="tel" class="i-cel" placeholder="Ej: 987654321" required><span class="info-text"></span></div>
+            <div><label class="mobile-label">N° Tickets</label><input type="number" class="i-tkt" min="1" placeholder="Ej: 5" required></div>
+            <div><label class="mobile-label">Referencia (Número)</label><input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off"></div>
           </div>
         </div>
         
@@ -88,7 +85,6 @@
       <p id="msg" class="msg"></p>
     </div>
 
-    <!-- Lado Derecho: Dashboard y Tablas -->
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div class="card">
         <h2>Avance de Meta</h2>
@@ -113,17 +109,23 @@
           <table id="tblMovs"><tbody></tbody></table>
         </div>
         
-        <h2>Top 5</h2>
+        <h2>TOP 3</h2>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-          <table id="tblParts"><tbody></tbody></table>
-          <table id="tblRefs"><tbody></tbody></table>
+          <div>
+            <h3>Top Participantes</h3>
+            <table id="tblParts"><tbody></tbody></table>
+          </div>
+          <div>
+            <h3>Top Referidores</h3>
+            <table id="tblRefs"><tbody></tbody></table>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    const API = "https://script.google.com/macros/s/AKfycbxMbw-0DYBbSWISb9pipfgXCrz_UtMu_57BkYM6Mt92SbcMk7_BlddiPhEveqespI1v9g/exec"; // ¡REEMPLAZAR!
+    const API = "https://script.google.com/macros/s/AKfycbxzw0P1WQeICoO1Jj50WramN9rb2eDcOFADB0NmxqTjxvht_zHcOfWQWGUh7OtWUPB4JQ/exec"; // ¡REEMPLAZAR!
     let bdParticipantes = []; 
 
     function renderDashboard(data) {
@@ -150,9 +152,8 @@
       document.getElementById("tblRefs").innerHTML = data.topRefs.map(r => `<tr><td>${r[0]}</td><td style="text-align:right; color:var(--ok);"><strong>+${r[1]}</strong></td></tr>`).join('');
     }
 
-    // Navegación Enter y Validación de Celdas
     document.getElementById('rowContainer').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
         e.preventDefault();
         const inputs = Array.from(document.querySelectorAll('#rowContainer input:not([disabled])'));
         const idx = inputs.indexOf(e.target);
@@ -184,13 +185,16 @@
       const row = document.createElement('div');
       row.className = 'form-row';
       row.innerHTML = `
-        <input type="text" class="i-nom" placeholder="Ej: Ana López" required>
+        <div><label class="mobile-label">Nombres Completos</label><input type="text" class="i-nom" placeholder="Ej: Ana López" required></div>
+        <div><label class="mobile-label">Celular</label><input type="tel" class="i-cel" placeholder="Ej: 912345678" required><span class="info-text"></span></div>
+        <div><label class="mobile-label">N° Tickets</label><input type="number" class="i-tkt" min="1" placeholder="Ej: 2" required></div>
         <div>
-          <input type="tel" class="i-cel" placeholder="Ej: 912345678" required>
-          <span class="info-text"></span>
+          <label class="mobile-label">Referencia (Número)</label>
+          <div style="display: flex; gap: 5px;">
+            <input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off">
+            <button type="button" class="btn-del" onclick="this.closest('.form-row').remove()" title="Eliminar participante">✖</button>
+          </div>
         </div>
-        <input type="number" class="i-tkt" min="1" placeholder="Ej: 2" required>
-        <input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off">
       `;
       document.getElementById('rowContainer').appendChild(row);
       row.querySelector('.i-nom').focus();
@@ -221,13 +225,12 @@
         msg.className = "msg ok";
         renderDashboard(res); 
         
-        // Resetear Formulario dejando solo 1 fila
         document.getElementById('rowContainer').innerHTML = `
           <div class="form-row">
-            <input type="text" class="i-nom" placeholder="Ej: Juan Pérez" required>
-            <div><input type="tel" class="i-cel" placeholder="Ej: 987654321" required><span class="info-text"></span></div>
-            <input type="number" class="i-tkt" min="1" placeholder="Ej: 5" required>
-            <input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off">
+            <div><label class="mobile-label">Nombres Completos</label><input type="text" class="i-nom" placeholder="Ej: Juan Pérez" required></div>
+            <div><label class="mobile-label">Celular</label><input type="tel" class="i-cel" placeholder="Ej: 987654321" required><span class="info-text"></span></div>
+            <div><label class="mobile-label">N° Tickets</label><input type="number" class="i-tkt" min="1" placeholder="Ej: 5" required></div>
+            <div><label class="mobile-label">Referencia (Número)</label><input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off"></div>
           </div>`;
       } catch {
         msg.textContent = "Error de conexión.";
