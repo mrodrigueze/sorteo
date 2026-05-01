@@ -3,22 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <title>Rifa 2026</title>
+  <title>Rifa A LA SUERTE</title>
   <style>
-    body   { font-family: system-ui, sans-serif; background: #f5f5f3; display: flex; justify-content: center; padding: 2rem; }
-    .card  { background: #fff; border: 1px solid #e5e5e5; border-radius: 14px; padding: 2rem; width: 100%; max-width: 420px; }
-    h1     { font-size: 20px; margin-bottom: 1.5rem; }
-    label  { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
-    input  { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 1rem; }
+    body { font-family: system-ui, sans-serif; background: #f5f5f3; display: flex; flex-direction: column; align-items: center; padding: 2rem; gap: 1rem; }
+    .card { background: #fff; border: 1px solid #e5e5e5; border-radius: 14px; padding: 1.5rem; width: 100%; max-width: 420px; box-sizing: border-box; }
+    h1, h2 { font-size: 18px; margin-top: 0; margin-bottom: 1rem; color: #333; }
+    label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
+    input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 1rem; box-sizing: border-box; }
     button { width: 100%; padding: 12px; background: #185FA5; color: #fff; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; }
     button:disabled { opacity: 0.6; }
-    .msg   { margin-top: 1rem; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
-    .ok    { display: block; background: #EAF3DE; color: #3B6D11; }
-    .err   { display: block; background: #FCEBEB; color: #A32D2D; }
+    .msg { margin-top: 1rem; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
+    .ok { display: block; background: #EAF3DE; color: #3B6D11; }
+    .err { display: block; background: #FCEBEB; color: #A32D2D; }
+    
+    /* Barra de Progreso */
+    .progress-container { width: 100%; background: #e0e0e0; border-radius: 8px; overflow: hidden; margin-bottom: 0.5rem; }
+    .progress-bar { height: 22px; background: #28a745; width: 0%; text-align: center; color: white; font-size: 12px; line-height: 22px; transition: width 0.4s ease; font-weight: bold; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
+    .stat-box { background: #f9f9f9; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #eee; }
+    .stat-val { font-size: 20px; font-weight: bold; color: #185FA5; }
+    .stat-lbl { font-size: 12px; color: #666; }
+    
+    /* Tablas */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 14px; }
+    th, td { text-align: left; padding: 8px 4px; border-bottom: 1px solid #f0f0f0; }
   </style>
 </head>
 <body>
+
+  <!-- KPIs y Progreso -->
+  <div class="card">
+    <h2>📊 Avance de Meta</h2>
+    <div class="progress-container">
+      <div id="progressBar" class="progress-bar">0%</div>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #555;">
+      <span>Vendidos: <strong id="tVendidos">0</strong></span>
+      <span>Meta: <strong>5000</strong></span>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-val" id="kDinero">S/ 0</div>
+        <div class="stat-lbl">Recaudado</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="kPart">0</div>
+        <div class="stat-lbl">Participantes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario -->
   <div class="card">
     <h1>🎟️ Compra de Tickets</h1>
     <form id="form">
@@ -28,35 +64,91 @@
       <input id="celular" type="tel" required>
       <label>Número de tickets</label>
       <input id="tickets" type="number" min="1" required>
-      <button id="btn">Enviar solicitud</button>
+      <label>Referencia (N° celular de quien te invitó - Opcional)</label>
+      <input id="referencia" type="tel">
+      <button id="btn" type="submit">Enviar solicitud</button>
     </form>
     <p id="msg" class="msg"></p>
   </div>
 
+  <!-- Rankings -->
+  <div class="card">
+    <h2>🏆 Top Participantes</h2>
+    <table id="tblParts"><tbody></tbody></table>
+    
+    <h2 style="margin-top: 1.5rem;">🥇 Top Referidores</h2>
+    <table id="tblRefs"><tbody></tbody></table>
+  </div>
+
   <script>
-    const API = "https://script.google.com/macros/s/AKfycby1WS6UaGuVeRyK7tMCKoPJM1mnQzfhPiR87gIBOvWJlib4VA4qTLy557X884QVRMDxZw/exec";
+    const API = "https://script.google.com/macros/s/AKfycbz_qN_NbPzYK6EBQH_3RgWS3L3XLY_MKjwgz8bKHfX1YxA1tw3Y02xvJ5uHo7FXMn_6/exec"; // ¡REEMPLAZAR!
+    const form = document.getElementById("form");
     const btn = document.getElementById("btn");
     const msg = document.getElementById("msg");
 
-    document.getElementById("form").addEventListener("submit", async (e) => {
+    function renderDashboard(data) {
+      if (!data || !data.kpis) return;
+      
+      // Actualizar Progreso
+      const vendidos = data.kpis.total_tickets || 0;
+      const pct = Math.min((vendidos / 5000) * 100, 100).toFixed(1);
+      
+      document.getElementById("progressBar").style.width = pct + "%";
+      document.getElementById("progressBar").textContent = pct + "%";
+      document.getElementById("tVendidos").textContent = vendidos;
+      
+      // Actualizar KPIs
+      document.getElementById("kDinero").textContent = "S/ " + (data.kpis.total_dinero || 0);
+      document.getElementById("kPart").textContent = data.kpis.participantes || 0;
+
+      // Actualizar Tablas (Renderizando HTML dinámico)
+      document.getElementById("tblParts").innerHTML = data.topParts
+        .map(r => `<tr><td>${r[0]}</td><td style="text-align:right"><strong>${r[1]}</strong> tkts</td></tr>`).join('');
+        
+      document.getElementById("tblRefs").innerHTML = data.topRefs
+        .map(r => `<tr><td>${r[0]}</td><td style="text-align:right"><strong>${r[1]}</strong> refs</td></tr>`).join('');
+    }
+
+    // Cargar estadísticas en tiempo real al entrar a la página
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const res = await fetch(API);
+        const data = await res.json();
+        renderDashboard(data);
+      } catch (err) { console.error("Error cargando dashboard inicial"); }
+    });
+
+    // Enviar Formulario
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
       btn.disabled = true;
-      btn.textContent = "Enviando...";
+      btn.textContent = "Procesando...";
+      msg.className = "msg";
 
       try {
-        await fetch(API, {
+        const res = await fetch(API, {
           method: "POST",
           body: JSON.stringify({
-            nombre:  document.getElementById("nombre").value,
+            nombre: document.getElementById("nombre").value,
             celular: document.getElementById("celular").value,
             tickets: document.getElementById("tickets").value,
+            referencia: document.getElementById("referencia").value
           }),
         });
-        msg.textContent = "¡Listo! Datos enviados correctamente.";
+        
+        const data = await res.json();
+        
+        if (data.error) throw new Error(data.error);
+
+        msg.textContent = data.message;
         msg.className = "msg ok";
-        e.target.reset();
-      } catch {
-        msg.textContent = "Error al enviar. Intenta nuevamente.";
+        
+        // El servidor devuelve la base de datos actualizada. Se renderiza instantáneo.
+        renderDashboard(data); 
+        form.reset();
+        
+      } catch (err) {
+        msg.textContent = "Error al conectar. Intenta nuevamente.";
         msg.className = "msg err";
       }
 
