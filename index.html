@@ -5,53 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rifa</title>
   <style>
-    :root { --p: #0f4c81; --bg: #f4f6f8; --card: #ffffff; --text: #2c3e50; --border: #e2e8f0; --ok: #10b981; --err: #ef4444; }
+    :root { --p: #6366f1; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --border: #cbd5e1; --ok: #10b981; --err: #ef4444; --accent: #f59e0b; }
     body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem; display: flex; justify-content: center; }
     .layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem; max-width: 1200px; width: 100%; align-items: start; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
     h1, h2, h3 { color: var(--p); margin: 0 0 1rem 0; }
-    h1, h2 { font-size: 1.1rem; border-bottom: 2px solid var(--bg); padding-bottom: 0.5rem; }
-    h3 { font-size: 0.9rem; margin-bottom: 0.5rem; }
+    h1, h2 { font-size: 1.2rem; border-bottom: 2px solid var(--bg); padding-bottom: 0.5rem; }
+    h3 { font-size: 0.95rem; margin-bottom: 0.5rem; color: #475569; }
     
-    .table-header { display: grid; grid-template-columns: 2fr 1.5fr 1fr 2fr; gap: 10px; font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 0.5rem; }
+    .table-header { display: grid; grid-template-columns: 2fr 1.5fr 1fr 2fr; gap: 10px; font-size: 0.85rem; font-weight: bold; color: #64748b; margin-bottom: 0.5rem; }
     .form-row { display: grid; grid-template-columns: 2fr 1.5fr 1fr 2fr; gap: 10px; margin-bottom: 10px; align-items: start; }
     .mobile-label { display: none; font-size: 0.75rem; font-weight: bold; color: var(--p); margin-bottom: 4px; }
     
-    input { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; box-sizing: border-box; transition: border-color 0.2s; }
-    input:focus { border-color: var(--p); }
-    input:disabled { background: #f8fafc; color: #94a3b8; }
+    input { width: 100%; padding: 0.7rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; box-sizing: border-box; transition: all 0.3s ease; }
+    input:focus { border-color: var(--p); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+    input:disabled { background: #f1f5f9; color: #94a3b8; }
     
-    .btn-add { background: transparent; color: var(--p); border: 1px dashed var(--p); padding: 0.6rem; width: 100%; border-radius: 6px; cursor: pointer; font-size: 0.9rem; margin-bottom: 1.5rem; transition: background 0.2s; }
-    .btn-add:hover { background: #f0f6fc; }
-    .btn-submit { background: var(--p); color: white; border: none; padding: 0.8rem; width: 100%; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: opacity 0.2s; }
-    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
-    .btn-del { background: #fee2e2; color: #991b1b; border: none; border-radius: 6px; padding: 0 12px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; height: 100%; }
-    .btn-del:hover { opacity: 0.8; }
+    .btn-add { background: transparent; color: var(--p); border: 2px dashed #a5b4fc; padding: 0.7rem; width: 100%; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600; margin-bottom: 1.5rem; transition: all 0.3s; }
+    .btn-add:hover { background: #e0e7ff; border-color: var(--p); }
+    .btn-submit { background: var(--p); color: white; border: none; padding: 0.9rem; width: 100%; border-radius: 8px; cursor: pointer; font-size: 1.05rem; font-weight: bold; transition: all 0.3s; box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4); }
+    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 8px -1px rgba(99, 102, 241, 0.5); }
+    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    .btn-del { background: #fee2e2; color: #ef4444; border: none; border-radius: 8px; padding: 0 12px; cursor: pointer; font-weight: bold; transition: all 0.2s; height: 100%; }
+    .btn-del:hover { background: #fca5a5; color: #991b1b; }
     
-    .progress-container { width: 100%; background: var(--border); border-radius: 6px; overflow: hidden; margin: 0.5rem 0; position: relative; height: 24px; }
-    .progress-bar { height: 100%; background: #f59e0b; width: 0%; text-align: center; color: white; font-size: 0.8rem; line-height: 24px; transition: 0.4s; font-weight: bold; }
+    .progress-container { width: 100%; background: #e2e8f0; border-radius: 8px; overflow: hidden; margin: 0.5rem 0; position: relative; height: 26px; }
+    .progress-bar { height: 100%; background: var(--accent); width: 0%; text-align: center; color: white; font-size: 0.85rem; line-height: 26px; transition: width 0.5s ease-in-out; font-weight: bold; }
     .progress-bar.success { background: var(--ok); }
-    .marker { position: absolute; left: 40%; top: 0; bottom: 0; width: 2px; background: rgba(0,0,0,0.3); z-index: 10; }
+    .marker { position: absolute; left: 40%; top: 0; bottom: 0; width: 2px; background: rgba(0,0,0,0.4); z-index: 10; }
     
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
-    .stat-box { background: var(--bg); padding: 1rem; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
-    .stat-val { font-size: 1.5rem; font-weight: bold; color: var(--p); }
-    .stat-lbl { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1rem; }
+    .stat-box { background: #f8fafc; padding: 1.2rem; border-radius: 12px; text-align: center; border: 1px solid var(--border); transition: transform 0.2s; }
+    .stat-box:hover { transform: scale(1.02); }
+    .stat-val { font-size: 1.6rem; font-weight: 800; color: var(--p); }
+    .stat-lbl { font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-top: 4px; }
     
     table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--border); }
-    .scrollable { max-height: 200px; overflow-y: auto; margin-bottom: 1rem; }
+    th, td { text-align: left; padding: 0.6rem; border-bottom: 1px solid var(--border); }
+    tr:hover td { background-color: #f8fafc; }
+    .scrollable { max-height: 200px; overflow-y: auto; margin-bottom: 1.5rem; padding-right: 5px; }
+    .scrollable::-webkit-scrollbar { width: 6px; }
+    .scrollable::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     
-    .msg { margin-top: 1rem; padding: 0.8rem; border-radius: 6px; font-size: 0.9rem; display: none; text-align: center; }
-    .msg.ok { display: block; background: #d1fae5; color: #065f46; }
-    .msg.err { display: block; background: #fee2e2; color: #991b1b; }
-    .info-text { font-size: 0.75rem; color: var(--p); display: block; margin-top: 4px; min-height: 14px; }
+    .msg { margin-top: 1rem; padding: 1rem; border-radius: 8px; font-size: 0.95rem; display: none; text-align: center; font-weight: 500; }
+    .msg.ok { display: block; background: #d1fae5; color: #065f46; border: 1px solid #34d399; }
+    .msg.err { display: block; background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+    .info-text { font-size: 0.75rem; color: var(--p); display: block; margin-top: 4px; min-height: 14px; font-weight: 600; }
 
     @media (max-width: 768px) {
       .layout { grid-template-columns: 1fr; }
       body { padding: 1rem; }
       .table-header { display: none; }
-      .form-row { display: flex; flex-direction: column; gap: 5px; border-bottom: 1px dashed var(--border); padding-bottom: 1rem; }
+      .form-row { display: flex; flex-direction: column; gap: 6px; border-bottom: 1px dashed var(--border); padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
       .mobile-label { display: block; }
     }
   </style>
@@ -60,34 +65,34 @@
 
   <div class="layout">
     <div class="card">
-      <h1>🎟️ Registro Rápido</h1>
+      <h1>✨ Registro Rápido 🎟️</h1>
       <div class="table-header">
-        <div>Nombres Completos</div>
-        <div>Celular</div>
-        <div>N° Tickets</div>
-        <div>Referencia (Número)</div>
+        <div>👤 Nombres Completos</div>
+        <div>📱 Celular</div>
+        <div>🎫 N° Tickets</div>
+        <div>🔗 Referencia (Número)</div>
       </div>
       
       <form id="form">
         <div id="rowContainer">
           <div class="form-row">
-            <div><label class="mobile-label">Nombres Completos</label><input type="text" class="i-nom" placeholder="Ej: Juan Pérez" required></div>
-            <div><label class="mobile-label">Celular</label><input type="tel" class="i-cel" placeholder="Ej: 987654321" required><span class="info-text"></span></div>
-            <div><label class="mobile-label">N° Tickets</label><input type="number" class="i-tkt" min="1" placeholder="Ej: 5" required></div>
-            <div><label class="mobile-label">Referencia (Número)</label><input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off"></div>
+            <div><label class="mobile-label">👤 Nombres Completos</label><input type="text" class="i-nom" placeholder="Ej: Juan Pérez" required></div>
+            <div><label class="mobile-label">📱 Celular</label><input type="tel" class="i-cel" placeholder="Ej: 987654321" required><span class="info-text"></span></div>
+            <div><label class="mobile-label">🎫 N° Tickets</label><input type="number" class="i-tkt" min="1" placeholder="Ej: 5" required></div>
+            <div><label class="mobile-label">🔗 Referencia (Número)</label><input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off"></div>
           </div>
         </div>
         
         <datalist id="listaRefs"></datalist>
-        <button type="button" class="btn-add" id="btnAddRow">+ Añadir otro participante</button>
-        <button type="submit" class="btn-submit" id="btn">Procesar Registros</button>
+        <button type="button" class="btn-add" id="btnAddRow">➕ Añadir otro participante</button>
+        <button type="submit" class="btn-submit" id="btn">🚀 Procesar Registros</button>
       </form>
       <p id="msg" class="msg"></p>
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div class="card">
-        <h2>Avance de Meta</h2>
+        <h2>📈 Avance de Meta</h2>
         <div class="progress-container">
           <div class="marker" title="Mínimo 2000"></div>
           <div id="progressBar" class="progress-bar">0%</div>
@@ -98,25 +103,25 @@
           <span>Meta: <strong style="color:var(--text)">5000</strong></span>
         </div>
         <div class="stats-grid">
-          <div class="stat-box"><div class="stat-val" id="kDinero">S/ 0</div><div class="stat-lbl">Recaudado</div></div>
-          <div class="stat-box"><div class="stat-val" id="kPart">0</div><div class="stat-lbl">Participantes</div></div>
+          <div class="stat-box"><div class="stat-val" id="kDinero">S/ 0</div><div class="stat-lbl">💰 Recaudado</div></div>
+          <div class="stat-box"><div class="stat-val" id="kPart">0</div><div class="stat-lbl">👥 Participantes</div></div>
         </div>
       </div>
 
       <div class="card">
-        <h2>Últimos Movimientos</h2>
+        <h2>⚡ Últimos Movimientos</h2>
         <div class="scrollable">
           <table id="tblMovs"><tbody></tbody></table>
         </div>
         
-        <h2>TOP 3</h2>
+        <h2>🏆 TOP 3</h2>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div>
-            <h3>Top Participantes</h3>
+            <h3>🥇 Top Participantes</h3>
             <table id="tblParts"><tbody></tbody></table>
           </div>
           <div>
-            <h3>Top Referidores</h3>
+            <h3>🌟 Top Referidores</h3>
             <table id="tblRefs"><tbody></tbody></table>
           </div>
         </div>
@@ -137,7 +142,7 @@
       const pBar = document.getElementById("progressBar");
       
       pBar.style.width = pct + "%";
-      if (vendidos >= 5000) { pBar.textContent = "¡Objetivo logrado!"; pBar.className = "progress-bar success"; } 
+      if (vendidos >= 5000) { pBar.textContent = "¡Objetivo logrado! 🎉"; pBar.className = "progress-bar success"; } 
       else if (vendidos >= 2000) { pBar.textContent = pct + "%"; pBar.className = "progress-bar success"; } 
       else { pBar.textContent = pct + "%"; pBar.className = "progress-bar"; }
       
@@ -171,7 +176,7 @@
         const nom = row.querySelector('.i-nom');
         
         if(match) {
-          info.textContent = `Registrado. Se sumarán tickets.`;
+          info.textContent = `✅ Registrado. Se sumarán tickets.`;
           nom.value = match.nombre;
           ref.value = ""; ref.disabled = true;
         } else {
@@ -185,14 +190,14 @@
       const row = document.createElement('div');
       row.className = 'form-row';
       row.innerHTML = `
-        <div><label class="mobile-label">Nombres Completos</label><input type="text" class="i-nom" placeholder="Ej: Ana López" required></div>
-        <div><label class="mobile-label">Celular</label><input type="tel" class="i-cel" placeholder="Ej: 912345678" required><span class="info-text"></span></div>
-        <div><label class="mobile-label">N° Tickets</label><input type="number" class="i-tkt" min="1" placeholder="Ej: 2" required></div>
+        <div><label class="mobile-label">👤 Nombres Completos</label><input type="text" class="i-nom" placeholder="Ej: Ana López" required></div>
+        <div><label class="mobile-label">📱 Celular</label><input type="tel" class="i-cel" placeholder="Ej: 912345678" required><span class="info-text"></span></div>
+        <div><label class="mobile-label">🎫 N° Tickets</label><input type="number" class="i-tkt" min="1" placeholder="Ej: 2" required></div>
         <div>
-          <label class="mobile-label">Referencia (Número)</label>
+          <label class="mobile-label">🔗 Referencia (Número)</label>
           <div style="display: flex; gap: 5px;">
             <input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off">
-            <button type="button" class="btn-del" onclick="this.closest('.form-row').remove()" title="Eliminar participante">✖</button>
+            <button type="button" class="btn-del" onclick="this.closest('.form-row').remove()" title="Eliminar participante">✖️</button>
           </div>
         </div>
       `;
@@ -208,7 +213,7 @@
       e.preventDefault();
       const btn = document.getElementById("btn");
       const msg = document.getElementById("msg");
-      btn.disabled = true; btn.textContent = "Procesando..."; msg.className = "msg";
+      btn.disabled = true; btn.textContent = "⏳ Procesando..."; msg.className = "msg";
 
       const dataBatch = [];
       document.querySelectorAll('.form-row').forEach(row => {
@@ -221,22 +226,22 @@
 
       try {
         const res = await (await fetch(API, { method: "POST", body: JSON.stringify(dataBatch) })).json();
-        msg.textContent = res.message;
+        msg.textContent = res.message + " 🎉";
         msg.className = "msg ok";
         renderDashboard(res); 
         
         document.getElementById('rowContainer').innerHTML = `
           <div class="form-row">
-            <div><label class="mobile-label">Nombres Completos</label><input type="text" class="i-nom" placeholder="Ej: Juan Pérez" required></div>
-            <div><label class="mobile-label">Celular</label><input type="tel" class="i-cel" placeholder="Ej: 987654321" required><span class="info-text"></span></div>
-            <div><label class="mobile-label">N° Tickets</label><input type="number" class="i-tkt" min="1" placeholder="Ej: 5" required></div>
-            <div><label class="mobile-label">Referencia (Número)</label><input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off"></div>
+            <div><label class="mobile-label">👤 Nombres Completos</label><input type="text" class="i-nom" placeholder="Ej: Juan Pérez" required></div>
+            <div><label class="mobile-label">📱 Celular</label><input type="tel" class="i-cel" placeholder="Ej: 987654321" required><span class="info-text"></span></div>
+            <div><label class="mobile-label">🎫 N° Tickets</label><input type="number" class="i-tkt" min="1" placeholder="Ej: 5" required></div>
+            <div><label class="mobile-label">🔗 Referencia (Número)</label><input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off"></div>
           </div>`;
       } catch {
-        msg.textContent = "Error de conexión.";
+        msg.textContent = "⚠️ Error de conexión.";
         msg.className = "msg err";
       }
-      btn.disabled = false; btn.textContent = "Procesar Registros";
+      btn.disabled = false; btn.textContent = "🚀 Procesar Registros";
     });
   </script>
 </body>
