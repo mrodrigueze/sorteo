@@ -3,95 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta property="og:title" content="Rifa">
-  <meta property="og:description" content="Registro de datos">
   <title>Rifa</title>
   <style>
-    body { font-family: system-ui, sans-serif; background: #f5f5f3; display: flex; flex-direction: column; align-items: center; padding: 2rem; gap: 1rem; }
-    .card { background: #fff; border: 1px solid #e5e5e5; border-radius: 14px; padding: 1.5rem; width: 100%; max-width: 420px; box-sizing: border-box; }
-    h1, h2 { font-size: 18px; margin-top: 0; margin-bottom: 1rem; color: #333; }
-    label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
-    input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 1rem; box-sizing: border-box; }
-    input:disabled { background: #eee; cursor: not-allowed; }
-    button { width: 100%; padding: 12px; background: #185FA5; color: #fff; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; }
-    button:disabled { opacity: 0.6; }
-    .msg { margin-top: 1rem; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
-    .ok { display: block; background: #EAF3DE; color: #3B6D11; }
-    .err { display: block; background: #FCEBEB; color: #A32D2D; }
-    .info { display: none; background: #e8f4fd; color: #0d4a82; padding: 8px; border-radius: 6px; font-size: 13px; margin-top: -10px; margin-bottom: 1rem; }
+    :root { --p: #0f4c81; --bg: #f4f6f8; --card: #ffffff; --text: #2c3e50; --border: #e2e8f0; --ok: #10b981; --err: #ef4444; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem; display: flex; justify-content: center; }
+    .layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem; max-width: 1200px; width: 100%; align-items: start; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    h1, h2 { font-size: 1.1rem; margin: 0 0 1rem 0; color: var(--p); border-bottom: 2px solid var(--bg); padding-bottom: 0.5rem; }
     
-    .progress-container { width: 100%; background: #e0e0e0; border-radius: 8px; overflow: hidden; margin-bottom: 0.5rem; position: relative; }
-    .progress-bar { height: 22px; background: #f39c12; width: 0%; text-align: center; color: white; font-size: 12px; line-height: 22px; transition: width 0.4s ease, background-color 0.4s ease; font-weight: bold; white-space: nowrap; overflow: hidden; }
-    .progress-bar.success { background: #28a745; }
-    .marker { position: absolute; left: 40%; top: 0; bottom: 0; width: 2px; background: #d32f2f; z-index: 10; }
+    /* Formulario Tipo Excel */
+    .table-header { display: grid; grid-template-columns: 2fr 1.5fr 1fr 2fr; gap: 10px; font-size: 0.8rem; font-weight: bold; color: #64748b; margin-bottom: 0.5rem; }
+    .form-row { display: grid; grid-template-columns: 2fr 1.5fr 1fr 2fr; gap: 10px; margin-bottom: 10px; align-items: start; }
+    input { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; box-sizing: border-box; transition: border-color 0.2s; }
+    input:focus { border-color: var(--p); }
+    input:disabled { background: #f8fafc; color: #94a3b8; }
     
+    /* Botones */
+    .btn-add { background: transparent; color: var(--p); border: 1px dashed var(--p); padding: 0.6rem; width: 100%; border-radius: 6px; cursor: pointer; font-size: 0.9rem; margin-bottom: 1.5rem; transition: background 0.2s; }
+    .btn-add:hover { background: #f0f6fc; }
+    .btn-submit { background: var(--p); color: white; border: none; padding: 0.8rem; width: 100%; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: opacity 0.2s; }
+    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+    
+    /* Dashboard & KPIs */
+    .progress-container { width: 100%; background: var(--border); border-radius: 6px; overflow: hidden; margin: 0.5rem 0; position: relative; height: 24px; }
+    .progress-bar { height: 100%; background: #f59e0b; width: 0%; text-align: center; color: white; font-size: 0.8rem; line-height: 24px; transition: 0.4s; font-weight: bold; }
+    .progress-bar.success { background: var(--ok); }
+    .marker { position: absolute; left: 40%; top: 0; bottom: 0; width: 2px; background: rgba(0,0,0,0.3); z-index: 10; }
     .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1rem; }
-    .stat-box { background: #f9f9f9; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #eee; }
-    .stat-val { font-size: 20px; font-weight: bold; color: #185FA5; }
-    .stat-lbl { font-size: 12px; color: #666; }
+    .stat-box { background: var(--bg); padding: 1rem; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
+    .stat-val { font-size: 1.5rem; font-weight: bold; color: var(--p); }
+    .stat-lbl { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
     
-    table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 14px; }
-    th, td { text-align: left; padding: 8px 4px; border-bottom: 1px solid #f0f0f0; }
-    .scrollable-table { max-height: 250px; overflow-y: auto; }
+    /* Tablas Data */
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--border); }
+    .scrollable { max-height: 200px; overflow-y: auto; margin-bottom: 1rem; }
+    
+    .msg { margin-top: 1rem; padding: 0.8rem; border-radius: 6px; font-size: 0.9rem; display: none; text-align: center; }
+    .msg.ok { display: block; background: #d1fae5; color: #065f46; }
+    .msg.err { display: block; background: #fee2e2; color: #991b1b; }
+    .info-text { font-size: 0.75rem; color: var(--p); display: block; margin-top: 4px; min-height: 14px; }
+
+    /* Móvil */
+    @media (max-width: 768px) {
+      .layout { grid-template-columns: 1fr; }
+      body { padding: 1rem; }
+      .table-header { display: none; }
+      .form-row { grid-template-columns: 1fr; border-bottom: 1px dashed var(--border); padding-bottom: 1rem; }
+      input { margin-bottom: 0.5rem; }
+    }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h2>📊 Avance de Meta</h2>
-    <div class="progress-container">
-      <div class="marker" title="Mínimo 2000"></div>
-      <div id="progressBar" class="progress-bar">0%</div>
+  <div class="layout">
+    <!-- Lado Izquierdo: Formularios -->
+    <div class="card">
+      <h1>🎟️ Registro Rápido</h1>
+      <div class="table-header">
+        <div>Nombres Completos</div>
+        <div>Celular</div>
+        <div>N° Tickets</div>
+        <div>Referencia</div>
+      </div>
+      
+      <form id="form">
+        <div id="rowContainer">
+          <!-- Fila Base -->
+          <div class="form-row">
+            <input type="text" class="i-nom" placeholder="Ej: Juan Pérez" required>
+            <div>
+              <input type="tel" class="i-cel" placeholder="Ej: 987654321" required>
+              <span class="info-text"></span>
+            </div>
+            <input type="number" class="i-tkt" min="1" placeholder="Ej: 5" required>
+            <input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off">
+          </div>
+        </div>
+        
+        <datalist id="listaRefs"></datalist>
+        <button type="button" class="btn-add" id="btnAddRow">+ Añadir otro participante</button>
+        <button type="submit" class="btn-submit" id="btn">Procesar Registros</button>
+      </form>
+      <p id="msg" class="msg"></p>
     </div>
-    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #555;">
-      <span>Vendidos: <strong id="tVendidos">0</strong></span>
-      <span>Total(Inc.Extra): <strong id="tTotal">0</strong></span>
-      <span>Meta: <strong>5000</strong></span>
-    </div>
-    <div class="stats-grid">
-      <div class="stat-box"><div class="stat-val" id="kDinero">S/ 0</div><div class="stat-lbl">Recaudado</div></div>
-      <div class="stat-box"><div class="stat-val" id="kPart">0</div><div class="stat-lbl">Participantes</div></div>
-    </div>
-  </div>
 
-  <div class="card">
-    <h1>🎟️ Rifa</h1>
-    <form id="form">
-      <label>Nombres completos</label>
-      <input id="nombre" type="text" required>
-      
-      <label>Celular</label>
-      <input id="celular" type="tel" required>
-      <div id="alertaExiste" class="info"></div>
-      
-      <label>Número de tickets netos a comprar</label>
-      <input id="tickets" type="number" min="1" required>
-      
-      <label>Referencia (Busca por nombre o escribe el celular)</label>
-      <input id="referencia" type="text" list="listaRefs" autocomplete="off">
-      <datalist id="listaRefs"></datalist>
-      
-      <button id="btn" type="submit">Enviar solicitud</button>
-    </form>
-    <p id="msg" class="msg"></p>
-  </div>
+    <!-- Lado Derecho: Dashboard y Tablas -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div class="card">
+        <h2>Avance de Meta</h2>
+        <div class="progress-container">
+          <div class="marker" title="Mínimo 2000"></div>
+          <div id="progressBar" class="progress-bar">0%</div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #64748b;">
+          <span>Vendidos: <strong id="tVendidos" style="color:var(--text)">0</strong></span>
+          <span>Total(Inc.Extra): <strong id="tTotal" style="color:var(--text)">0</strong></span>
+          <span>Meta: <strong style="color:var(--text)">5000</strong></span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-box"><div class="stat-val" id="kDinero">S/ 0</div><div class="stat-lbl">Recaudado</div></div>
+          <div class="stat-box"><div class="stat-val" id="kPart">0</div><div class="stat-lbl">Participantes</div></div>
+        </div>
+      </div>
 
-  <div class="card">
-    <h2>📜 Últimos Movimientos</h2>
-    <div class="scrollable-table">
-      <table id="tblMovs"><tbody></tbody></table>
+      <div class="card">
+        <h2>Últimos Movimientos</h2>
+        <div class="scrollable">
+          <table id="tblMovs"><tbody></tbody></table>
+        </div>
+        
+        <h2>Top 5</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <table id="tblParts"><tbody></tbody></table>
+          <table id="tblRefs"><tbody></tbody></table>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <div class="card">
-    <h2>🏆 Top Participantes</h2>
-    <table id="tblParts"><tbody></tbody></table>
-    <h2 style="margin-top: 1.5rem;">🥇 Top Referidores</h2>
-    <table id="tblRefs"><tbody></tbody></table>
   </div>
 
   <script>
-    const API = "https://script.google.com/macros/s/AKfycbz56rtRnSgCdK9Y7MmuMcRUMPkXDS_3NjVPXQWi1J5ZvRi0PN0E0EvVsKuKfqRccQ0_lQ/exec"; // ¡REEMPLAZAR!
+    const API = "https://script.google.com/macros/s/AKfycbxMbw-0DYBbSWISb9pipfgXCrz_UtMu_57BkYM6Mt92SbcMk7_BlddiPhEveqespI1v9g/exec"; // ¡REEMPLAZAR!
     let bdParticipantes = []; 
 
     function renderDashboard(data) {
@@ -103,56 +135,65 @@
       const pBar = document.getElementById("progressBar");
       
       pBar.style.width = pct + "%";
-      
-      if (vendidos >= 5000) {
-        pBar.textContent = "¡Felicidades, conseguiste el objetivo!";
-        pBar.className = "progress-bar success";
-      } else if (vendidos >= 2000) {
-        pBar.textContent = pct + "%";
-        pBar.className = "progress-bar success";
-      } else {
-        pBar.textContent = pct + "%";
-        pBar.className = "progress-bar";
-      }
+      if (vendidos >= 5000) { pBar.textContent = "¡Objetivo logrado!"; pBar.className = "progress-bar success"; } 
+      else if (vendidos >= 2000) { pBar.textContent = pct + "%"; pBar.className = "progress-bar success"; } 
+      else { pBar.textContent = pct + "%"; pBar.className = "progress-bar"; }
       
       document.getElementById("tVendidos").textContent = vendidos;
       document.getElementById("tTotal").textContent = data.kpis.total_tickets;
       document.getElementById("kDinero").textContent = "S/ " + data.kpis.total_dinero;
       document.getElementById("kPart").textContent = data.kpis.participantes;
 
-      document.getElementById("listaRefs").innerHTML = bdParticipantes.map(p => 
-        `<option value="${p.celular}">${p.nombre}</option>`
-      ).join('');
-
-      // Renderizar Últimos Movimientos (Invertido para ver el más reciente primero)
-      document.getElementById("tblMovs").innerHTML = [...bdParticipantes].reverse().map(p => 
-        `<tr><td>${p.nombre}</td><td style="text-align:right"><strong>${p.tkts}</strong> tkts</td></tr>`
-      ).join('');
-
-      document.getElementById("tblParts").innerHTML = data.topParts.map(r => 
-        `<tr><td>${r[0]}</td><td style="text-align:right"><strong>${r[1]}</strong></td></tr>`).join('');
-        
-      document.getElementById("tblRefs").innerHTML = data.topRefs.map(r => 
-        `<tr><td>${r[0]}</td><td style="text-align:right; color:#28a745;"><strong>+${r[1]}</strong></td></tr>`).join('');
+      document.getElementById("listaRefs").innerHTML = bdParticipantes.map(p => `<option value="${p.celular}">${p.nombre}</option>`).join('');
+      document.getElementById("tblMovs").innerHTML = [...bdParticipantes].reverse().map(p => `<tr><td>${p.nombre}</td><td style="text-align:right"><strong>${p.tkts}</strong> tkts</td></tr>`).join('');
+      document.getElementById("tblParts").innerHTML = data.topParts.map(r => `<tr><td>${r[0]}</td><td style="text-align:right"><strong>${r[1]}</strong></td></tr>`).join('');
+      document.getElementById("tblRefs").innerHTML = data.topRefs.map(r => `<tr><td>${r[0]}</td><td style="text-align:right; color:var(--ok);"><strong>+${r[1]}</strong></td></tr>`).join('');
     }
 
-    document.getElementById("celular").addEventListener("input", (e) => {
-      const cel = e.target.value.trim();
-      const match = bdParticipantes.find(p => p.celular === cel);
-      const alerta = document.getElementById("alertaExiste");
-      const inputNombre = document.getElementById("nombre");
-      const inputRef = document.getElementById("referencia");
-      
-      if(match) {
-        alerta.style.display = "block";
-        alerta.textContent = `✅ Registrado como ${match.nombre}. Se sumarán los tickets a su cuenta.`;
-        inputNombre.value = match.nombre;
-        inputRef.value = "";
-        inputRef.disabled = true; // Bloquear referencia
-      } else {
-        alerta.style.display = "none";
-        inputRef.disabled = false; // Desbloquear referencia
+    // Navegación Enter y Validación de Celdas
+    document.getElementById('rowContainer').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const inputs = Array.from(document.querySelectorAll('#rowContainer input:not([disabled])'));
+        const idx = inputs.indexOf(e.target);
+        if (idx > -1 && idx < inputs.length - 1) inputs[idx + 1].focus();
+        else if (idx === inputs.length - 1) document.getElementById('btnAddRow').click();
       }
+    });
+
+    document.getElementById('rowContainer').addEventListener('input', (e) => {
+      if(e.target.classList.contains('i-cel')) {
+        const row = e.target.closest('.form-row');
+        const match = bdParticipantes.find(p => p.celular === e.target.value.trim());
+        const info = row.querySelector('.info-text');
+        const ref = row.querySelector('.i-ref');
+        const nom = row.querySelector('.i-nom');
+        
+        if(match) {
+          info.textContent = `Registrado. Se sumarán tickets.`;
+          nom.value = match.nombre;
+          ref.value = ""; ref.disabled = true;
+        } else {
+          info.textContent = "";
+          ref.disabled = false;
+        }
+      }
+    });
+
+    document.getElementById('btnAddRow').addEventListener('click', () => {
+      const row = document.createElement('div');
+      row.className = 'form-row';
+      row.innerHTML = `
+        <input type="text" class="i-nom" placeholder="Ej: Ana López" required>
+        <div>
+          <input type="tel" class="i-cel" placeholder="Ej: 912345678" required>
+          <span class="info-text"></span>
+        </div>
+        <input type="number" class="i-tkt" min="1" placeholder="Ej: 2" required>
+        <input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off">
+      `;
+      document.getElementById('rowContainer').appendChild(row);
+      row.querySelector('.i-nom').focus();
     });
 
     window.addEventListener("DOMContentLoaded", async () => {
@@ -165,28 +206,34 @@
       const msg = document.getElementById("msg");
       btn.disabled = true; btn.textContent = "Procesando..."; msg.className = "msg";
 
+      const dataBatch = [];
+      document.querySelectorAll('.form-row').forEach(row => {
+        const nom = row.querySelector('.i-nom').value;
+        const cel = row.querySelector('.i-cel').value;
+        const tkt = row.querySelector('.i-tkt').value;
+        const ref = row.querySelector('.i-ref').value;
+        if(nom && cel && tkt) dataBatch.push({ nombre: nom, celular: cel, tickets: tkt, referencia: ref });
+      });
+
       try {
-        const res = await (await fetch(API, {
-          method: "POST",
-          body: JSON.stringify({
-            nombre: document.getElementById("nombre").value,
-            celular: document.getElementById("celular").value,
-            tickets: document.getElementById("tickets").value,
-            referencia: document.getElementById("referencia").value
-          }),
-        })).json();
-        
+        const res = await (await fetch(API, { method: "POST", body: JSON.stringify(dataBatch) })).json();
         msg.textContent = res.message;
         msg.className = "msg ok";
         renderDashboard(res); 
-        e.target.reset();
-        document.getElementById("alertaExiste").style.display = "none";
-        document.getElementById("referencia").disabled = false;
+        
+        // Resetear Formulario dejando solo 1 fila
+        document.getElementById('rowContainer').innerHTML = `
+          <div class="form-row">
+            <input type="text" class="i-nom" placeholder="Ej: Juan Pérez" required>
+            <div><input type="tel" class="i-cel" placeholder="Ej: 987654321" required><span class="info-text"></span></div>
+            <input type="number" class="i-tkt" min="1" placeholder="Ej: 5" required>
+            <input type="text" class="i-ref" list="listaRefs" placeholder="Opcional" autocomplete="off">
+          </div>`;
       } catch {
-        msg.textContent = "Error al conectar.";
+        msg.textContent = "Error de conexión.";
         msg.className = "msg err";
       }
-      btn.disabled = false; btn.textContent = "Enviar solicitud";
+      btn.disabled = false; btn.textContent = "Procesar Registros";
     });
   </script>
 </body>
